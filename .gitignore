@@ -46,3 +46,13 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Entorno y secretos (Fase 2: credenciales de Neon / API)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+android/key.properties
+*.jks
+*.keystore
