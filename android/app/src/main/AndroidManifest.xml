@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Necesario para consumir la API REST / Neon en builds de release.
+         Flutter solo lo incluye por defecto en debug y profile. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
-        android:label="gestor_agenda"
+        android:label="Gestor de Agenda"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
