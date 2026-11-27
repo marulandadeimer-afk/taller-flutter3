@@ -17,14 +17,14 @@ lib/
 ├── core/
 │   ├── constants/            # URLs de API, claves, rutas
 │   ├── errors/               # Exceptions, Failures y su traducción
-│   ├── network/              # Cliente HTTP (Dio/Http) y estado de red
+│   ├── network/              # ApiClient + DioApiClient (HTTP)
 │   └── utils/                # Result, formateadores de fecha, validadores
 ├── features/
 │   └── planner/
 │       ├── data/
-│       │   ├── datasources/  # Conexión remota (API/Neon) y local (caché)
-│       │   ├── models/       # Mapeo JSON <-> Entidad (fromJson / toJson)
-│       │   └── repositories/ # Implementación de los contratos de dominio
+│       │   ├── datasources/  # Fuente remota (REST) y local (caché)
+│       │   ├── models/       # EventoModel, CategoriaModel (fromJson/toJson)
+│       │   └── repositories/ # EventoRepositoryImpl, CategoriaRepositoryImpl
 │       ├── domain/
 │       │   ├── entities/     # Evento, Categoria, Usuario, EstadoEvento
 │       │   ├── repositories/ # Contratos abstractos de eventos y categorías
@@ -74,7 +74,7 @@ Proyecto inicializado únicamente para **Android** y **Web** (`--platforms=andro
 | Fase | Alcance | Estado |
 |---|---|---|
 | 1 | Infraestructura, base de datos Neon y capa de dominio | ✅ Completada (entrega con tag `v0.1.0`) |
-| 2 | Capa de datos e integración con Neon | ⏳ Pendiente (26 Nov) |
+| 2 | Capa de datos e integración con Neon | ✅ Implementada (falta desplegar la API y probar contra Neon) |
 | 3 | Presentación, estado y despliegue web | ⏳ Pendiente |
 
 ## Cómo ejecutar
@@ -124,14 +124,34 @@ resultado.fold(
 );
 ```
 
+## Capa de datos (Fase 2)
+
+- `core/network/api_client.dart` define el contrato HTTP y `dio_api_client.dart` lo implementa con **Dio**, traduciendo errores HTTP/red a `ServerException`, `ValidationException`, `NotFoundException`, etc.
+- `data/models/` convierte el JSON de PostgREST (`snake_case`, fechas ISO-8601) a las entidades de dominio.
+- `data/datasources/` contiene la fuente **remota** (API REST) y la **local** (caché en memoria).
+- `data/repositories/` implementa `EventoRepository` y `CategoriaRepository`; si la API falla con `ServerException`, devuelve la última lista cacheada en lugar de romper la pantalla.
+
+### Configurar la URL de la API
+
+La URL no se versiona: se inyecta en tiempo de compilación.
+
+```bash
+flutter run -d chrome \
+  --dart-define=API_BASE_URL=https://<tu-proyecto>.neon.tech/rest \
+  --dart-define=API_KEY=<anon-key-publica>
+```
+
+`API_KEY` es opcional y solo debe contener una clave pública (nunca la contraseña de Postgres). El contrato completo de endpoints, cabeceras y ejemplos de JSON está en [`docs/api-rest.md`](docs/api-rest.md).
+
 ## Pruebas
 
 ```bash
-flutter test                # 60 pruebas unitarias
+flutter test                # 101 pruebas unitarias
 flutter test --coverage     # genera coverage/lcov.info
 ```
 
-Las pruebas de `test/features/planner/domain/` usan repositorios en memoria (`fakes/`) y no necesitan red, Neon ni mocks de paquetes externos.
+Las pruebas de `test/features/planner/domain/` y `test/features/planner/data/` usan repositorios y clientes HTTP falsos (`fakes/`): no necesitan red, Neon ni mocks de paquetes externos.
+
 
 ## Base de datos
 
