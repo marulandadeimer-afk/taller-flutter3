@@ -77,6 +77,8 @@ Proyecto inicializado únicamente para **Android** y **Web** (`--platforms=andro
 | 2 | Capa de datos e integración con Neon | ✅ Implementada (falta desplegar la API y probar contra Neon) |
 | 3 | Presentación, estado y despliegue web | ⏳ Pendiente |
 
+> Los pasos operativos pendientes (admin, release, Neon y evidencias) están en [`docs/pasos-pendientes.md`](docs/pasos-pendientes.md).
+
 ## Cómo ejecutar
 
 Requisitos: Flutter **3.35 o superior** (Dart 3.5+).
